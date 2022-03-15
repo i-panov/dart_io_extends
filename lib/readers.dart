@@ -7,23 +7,29 @@ import 'package:io_extends/exceptions.dart';
 abstract class Reader {
   int _offset = -1;
 
-  /// Текущее смещение от начала
+  /// Current offset from start
   int get offset => _offset;
 
   int _length = -1;
 
-  /// Общее количество байт
+  /// All bytes count
   int get length => throw UnimplementedError();
 
-  /// Осталось байт до конца
+  /// Left bytes count
   int get left => max(length - offset, 0);
 
-  /// Достигнут ли конец
+  /// Is end reached
   bool get eof => offset < length;
 
   Uint8List readBytes(int count) {
     _requireGreaterThenZero(count);
-    return Uint8List.fromList(List.generate(count, (_) => readUint8()));
+    final result = Uint8List(count);
+
+    for (int i = 0; i < count && !eof; i++) {
+      result[i] = readUint8();
+    }
+
+    return result;
   }
 
   int readUint8();
