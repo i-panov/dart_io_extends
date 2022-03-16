@@ -19,17 +19,17 @@ abstract class Reader {
   int get left => max(length - offset, 0);
 
   /// Is end reached
-  bool get eof => offset < length;
+  bool get eof => offset >= length;
 
   Uint8List readBytes(int count) {
     _requireGreaterThenZero(count);
-    final result = Uint8List(count);
 
-    for (int i = 0; i < count && !eof; i++) {
-      result[i] = readUint8();
-    }
+    final result = Iterable.generate(count, (_) => !eof ? readUint8() : null)
+      .where((b) => b != null)
+      .map((b) => b!)
+      .toList(growable: false);
 
-    return result;
+    return Uint8List.fromList(result);
   }
 
   int readUint8();
